@@ -5,7 +5,7 @@ import Search from "./Routes/Search";
 import Tv from "./Routes/Tv";
 function App() {
   return (
-    <Router>
+    <Router basename={process.env.PUBLIC_URL}>
       <Header />
       <Switch>
         <Route path="/tv">
@@ -14,7 +14,7 @@ function App() {
         <Route path="/search">
           <Search />
         </Route>
-        <Route path="/">
+        <Route path={["/", "/movies/:movieId"]}>
           <Home />
         </Route>
       </Switch>
