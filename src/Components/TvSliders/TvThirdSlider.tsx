@@ -1,12 +1,16 @@
 import { useQuery } from "react-query";
 import styled from "styled-components";
 import {
+  getAiringTodayTv,
   getLatestMovie,
   getMovies,
+  getPopularTv,
   getTopRatedMovie,
+  getTopRatedTv,
   getUpcomingMovie,
   IGetLatestMoviesResult,
   IGetMoviesResult,
+  IGetTvResult,
 } from "../../api";
 import { makeImagePath } from "../../utils";
 import {
@@ -25,6 +29,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useRecoilState } from "recoil";
 import { sliderNumAtom } from "../../atom";
+const sliderString = "3";
 const Wrapper = styled.div`
   background-color: black;
   z-index: -1;
@@ -34,24 +39,6 @@ const Loader = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-`;
-const Banner = styled.div<{ bgPhoto: string }>`
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 60px;
-  background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 1)),
-    url(${(props) => props.bgPhoto});
-  background-size: cover;
-`;
-const Title = styled.h2`
-  font-size: 48px;
-  margin-bottom: 20px;
-`;
-const Overview = styled.p`
-  font-size: 24px;
-  width: 50%;
 `;
 const Slider = styled.div`
   position: relative;
@@ -195,19 +182,18 @@ const InfoVariants = {
   },
 };
 const offset = 6;
-function ThirdSlider() {
+function TvFirstSlider() {
   const history = useHistory();
   const { scrollY } = useViewportScroll();
-  const bigMovieMatch = useRouteMatch<{ movieId: string }>("/movies/:movieId");
-  const { data, isLoading } = useQuery<IGetMoviesResult>(
-    ["movies", "upcoming"],
-    getUpcomingMovie
+  const bigMovieMatch = useRouteMatch<{ tvId: string }>("/tvs/:tvId");
+  const { data, isLoading } = useQuery<IGetTvResult>(
+    ["tvs", "TopRated"],
+    getTopRatedTv
   );
   const [back, setBack] = useState(false);
   const [index, setIndex] = useState(0);
   const [leaving, setLeaving] = useState(false);
   const [sliderNum, setSliderNum] = useRecoilState(sliderNumAtom);
-
   const nextBtnClicked = () => {
     if (data) {
       if (leaving) return;
@@ -229,16 +215,14 @@ function ThirdSlider() {
     }
   };
   const toggleLeaving = () => setLeaving((prev) => !prev);
-  const onBoxClicked = (movieId: number) => {
-    setSliderNum(3);
-    history.push(`/movies/${movieId}`);
+  const onBoxClicked = (tvId: number) => {
+    setSliderNum(+sliderString);
+    history.push(`/tvs/${tvId}`);
   };
-  const onOverlayClick = () => history.push("/");
+  const onOverlayClick = () => history.push("/tvs");
   const clickedMoive =
-    bigMovieMatch?.params.movieId &&
-    data?.results.find(
-      (movie) => String(movie.id) === bigMovieMatch.params.movieId
-    );
+    bigMovieMatch?.params.tvId &&
+    data?.results.find((tv) => String(tv.id) === bigMovieMatch.params.tvId);
   return (
     <Wrapper>
       {isLoading ? (
@@ -247,7 +231,7 @@ function ThirdSlider() {
         <>
           <Slider>
             <SliderHeader>
-              <SliderTitle>Upcoming Movies</SliderTitle>
+              <SliderTitle>Top Rated Tvs</SliderTitle>
               <SliderBtn onClick={prevBtnClicked}>
                 <FontAwesomeIcon icon={faAngleLeft} />
               </SliderBtn>
@@ -274,7 +258,7 @@ function ThirdSlider() {
                   .slice(offset * index, offset * index + offset)
                   .map((movie) => (
                     <Box
-                      layoutId={String(movie.id) + "3"}
+                      layoutId={String(movie.id) + sliderString}
                       onClick={() => onBoxClicked(movie.id)}
                       key={movie.id}
                       variants={BoxVariants}
@@ -286,7 +270,7 @@ function ThirdSlider() {
                         bgPhoto={makeImagePath(movie.backdrop_path, "w500")}
                       />
                       <Info variants={InfoVariants}>
-                        <h4>{movie.title}</h4>
+                        <h4>{movie.name}</h4>
                       </Info>
                     </Box>
                   ))}
@@ -294,7 +278,7 @@ function ThirdSlider() {
             </AnimatePresence>
           </Slider>
           <AnimatePresence>
-            {sliderNum === 3 && bigMovieMatch ? (
+            {sliderNum === +sliderString && bigMovieMatch ? (
               <>
                 <Overlay
                   onClick={onOverlayClick}
@@ -303,7 +287,7 @@ function ThirdSlider() {
                 />
                 <BigMovie
                   style={{ top: scrollY.get() + 100 }}
-                  layoutId={bigMovieMatch.params.movieId + "3"}
+                  layoutId={bigMovieMatch.params.tvId + sliderString}
                 >
                   {clickedMoive && (
                     <>
@@ -316,8 +300,8 @@ function ThirdSlider() {
                         }}
                       />
                       <BigInfoBox>
-                        <BigTitle>{clickedMoive.title}</BigTitle>
-                        <h1>Released date : {clickedMoive.release_date}</h1>
+                        <BigTitle>{clickedMoive.name}</BigTitle>
+                        <h1>First Air date : {clickedMoive.first_air_date}</h1>
                         <BigInfoVote>
                           <FontAwesomeIcon
                             icon={faStar}
@@ -341,4 +325,4 @@ function ThirdSlider() {
     </Wrapper>
   );
 }
-export default ThirdSlider;
+export default TvFirstSlider;

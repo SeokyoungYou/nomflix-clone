@@ -25,6 +25,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useRecoilState } from "recoil";
 import { sliderNumAtom } from "../../atom";
+
+const sliderString = "4";
 const Wrapper = styled.div`
   background-color: black;
   z-index: -1;
@@ -34,24 +36,6 @@ const Loader = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-`;
-const Banner = styled.div<{ bgPhoto: string }>`
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 60px;
-  background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 1)),
-    url(${(props) => props.bgPhoto});
-  background-size: cover;
-`;
-const Title = styled.h2`
-  font-size: 48px;
-  margin-bottom: 20px;
-`;
-const Overview = styled.p`
-  font-size: 24px;
-  width: 50%;
 `;
 const Slider = styled.div`
   position: relative;
@@ -164,7 +148,6 @@ const BigTitle = styled.h3`
   margin-bottom: 50px;
 `;
 const BigOverview = styled.p`
-  /* padding: 20px; */
   color: ${(props) => props.theme.white.lighter};
 `;
 const rowVariants = {
@@ -196,68 +179,34 @@ const InfoVariants = {
   },
 };
 const offset = 6;
-function FirstSlider() {
+function FourthSlider() {
   const history = useHistory();
   const { scrollY } = useViewportScroll();
   const bigMovieMatch = useRouteMatch<{ movieId: string }>("/movies/:movieId");
-  const { data, isLoading } = useQuery<IGetMoviesResult>(
-    ["movies", "nowPlaying"],
-    getMovies
+  const { data, isLoading } = useQuery<IGetLatestMoviesResult>(
+    ["movies", "lateset"],
+    getLatestMovie
   );
   const [back, setBack] = useState(false);
   const [index, setIndex] = useState(0);
   const [leaving, setLeaving] = useState(false);
   const [sliderNum, setSliderNum] = useRecoilState(sliderNumAtom);
-  const nextBtnClicked = () => {
-    if (data) {
-      if (leaving) return;
-      setBack(false);
-      toggleLeaving();
-      const totalMovies = data.results.length - 1; //except banner movie
-      const maxIndex = Math.floor(totalMovies / offset);
-      setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
-    }
-  };
-  const prevBtnClicked = () => {
-    if (data) {
-      if (leaving) return;
-      setBack(true);
-      toggleLeaving();
-      const totalMovies = data.results.length - 1; //except banner movie
-      const maxIndex = Math.floor(totalMovies / offset);
-      setIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
-    }
-  };
   const toggleLeaving = () => setLeaving((prev) => !prev);
   const onBoxClicked = (movieId: number) => {
-    setSliderNum(1);
+    setSliderNum(+sliderString);
     history.push(`/movies/${movieId}`);
   };
   const onOverlayClick = () => history.push("/");
-  const clickedMoive =
-    bigMovieMatch?.params.movieId &&
-    data?.results.find(
-      (movie) => String(movie.id) === bigMovieMatch.params.movieId
-    );
+  const clickedMoive = data;
   return (
     <Wrapper>
       {isLoading ? (
         <Loader>Loading</Loader>
       ) : (
         <>
-          <Banner bgPhoto={makeImagePath(data?.results[0].backdrop_path || "")}>
-            <Title>{data?.results[0].title}</Title>
-            <Overview>{data?.results[0].overview}</Overview>
-          </Banner>
           <Slider>
             <SliderHeader>
-              <SliderTitle>Latest Movies</SliderTitle>
-              <SliderBtn onClick={prevBtnClicked}>
-                <FontAwesomeIcon icon={faAngleLeft} />
-              </SliderBtn>
-              <SliderBtn onClick={nextBtnClicked}>
-                <FontAwesomeIcon icon={faAngleRight} />
-              </SliderBtn>
+              <SliderTitle>Latest Movie</SliderTitle>
             </SliderHeader>
             <AnimatePresence
               initial={false}
@@ -273,32 +222,27 @@ function FirstSlider() {
                 exit="exit"
                 transition={{ type: "tween", duration: 1 }}
               >
-                {data?.results
-                  .slice(1)
-                  .slice(offset * index, offset * index + offset)
-                  .map((movie) => (
-                    <Box
-                      layoutId={String(movie.id) + "1"}
-                      onClick={() => onBoxClicked(movie.id)}
-                      key={movie.id}
-                      variants={BoxVariants}
-                      whileHover="hover"
-                      initial="normal"
-                      transition={{ type: "tween" }}
-                    >
-                      <BoxImg
-                        bgPhoto={makeImagePath(movie.backdrop_path, "w500")}
-                      />
-                      <Info variants={InfoVariants}>
-                        <h4>{movie.title}</h4>
-                      </Info>
-                    </Box>
-                  ))}
+                {data ? (
+                  <Box
+                    layoutId={String(data.id) + sliderString}
+                    onClick={() => onBoxClicked(data.id)}
+                    key={data.id}
+                    variants={BoxVariants}
+                    whileHover="hover"
+                    initial="normal"
+                    transition={{ type: "tween" }}
+                  >
+                    <BoxImg bgPhoto={makeImagePath(data.poster_path, "w500")} />
+                    <Info variants={InfoVariants}>
+                      <h4>{data.title}</h4>
+                    </Info>
+                  </Box>
+                ) : null}
               </Row>
             </AnimatePresence>
           </Slider>
           <AnimatePresence>
-            {sliderNum === 1 && bigMovieMatch ? (
+            {sliderNum === +sliderString && bigMovieMatch ? (
               <>
                 <Overlay
                   onClick={onOverlayClick}
@@ -307,14 +251,14 @@ function FirstSlider() {
                 />
                 <BigMovie
                   style={{ top: scrollY.get() + 100 }}
-                  layoutId={bigMovieMatch.params.movieId + "1"}
+                  layoutId={bigMovieMatch.params.movieId + sliderString}
                 >
                   {clickedMoive && (
                     <>
                       <BigCover
                         style={{
                           backgroundImage: `linear-gradient(to top, black, transparent), url(${makeImagePath(
-                            clickedMoive.backdrop_path,
+                            clickedMoive.poster_path,
                             "w500"
                           )})`,
                         }}
@@ -345,4 +289,4 @@ function FirstSlider() {
     </Wrapper>
   );
 }
-export default FirstSlider;
+export default FourthSlider;

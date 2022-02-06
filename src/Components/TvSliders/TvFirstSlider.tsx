@@ -3,10 +3,12 @@ import styled from "styled-components";
 import {
   getLatestMovie,
   getMovies,
+  getPopularTv,
   getTopRatedMovie,
   getUpcomingMovie,
   IGetLatestMoviesResult,
   IGetMoviesResult,
+  IGetTvResult,
 } from "../../api";
 import { makeImagePath } from "../../utils";
 import {
@@ -25,6 +27,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useRecoilState } from "recoil";
 import { sliderNumAtom } from "../../atom";
+const sliderString = "1";
 const Wrapper = styled.div`
   background-color: black;
   z-index: -1;
@@ -195,13 +198,13 @@ const InfoVariants = {
   },
 };
 const offset = 6;
-function SecondSlider() {
+function TvFirstSlider() {
   const history = useHistory();
   const { scrollY } = useViewportScroll();
-  const bigMovieMatch = useRouteMatch<{ movieId: string }>("/movies/:movieId");
-  const { data, isLoading } = useQuery<IGetMoviesResult>(
-    ["movies", "topRated"],
-    getTopRatedMovie
+  const bigMovieMatch = useRouteMatch<{ tvId: string }>("/tvs/:tvId");
+  const { data, isLoading } = useQuery<IGetTvResult>(
+    ["tvs", "popular"],
+    getPopularTv
   );
   const [back, setBack] = useState(false);
   const [index, setIndex] = useState(0);
@@ -228,25 +231,27 @@ function SecondSlider() {
     }
   };
   const toggleLeaving = () => setLeaving((prev) => !prev);
-  const onBoxClicked = (movieId: number) => {
-    setSliderNum(2);
-    history.push(`/movies/${movieId}`);
+  const onBoxClicked = (tvId: number) => {
+    setSliderNum(+sliderString);
+    history.push(`/tvs/${tvId}`);
   };
-  const onOverlayClick = () => history.push("/");
+  const onOverlayClick = () => history.push("/tvs");
   const clickedMoive =
-    bigMovieMatch?.params.movieId &&
-    data?.results.find(
-      (movie) => String(movie.id) === bigMovieMatch.params.movieId
-    );
+    bigMovieMatch?.params.tvId &&
+    data?.results.find((tv) => String(tv.id) === bigMovieMatch.params.tvId);
   return (
     <Wrapper>
       {isLoading ? (
         <Loader>Loading</Loader>
       ) : (
         <>
+          <Banner bgPhoto={makeImagePath(data?.results[0].backdrop_path || "")}>
+            <Title>{data?.results[0].name}</Title>
+            <Overview>{data?.results[0].overview}</Overview>
+          </Banner>
           <Slider>
             <SliderHeader>
-              <SliderTitle>Top Rated Movies</SliderTitle>
+              <SliderTitle>Popular Tvs</SliderTitle>
               <SliderBtn onClick={prevBtnClicked}>
                 <FontAwesomeIcon icon={faAngleLeft} />
               </SliderBtn>
@@ -273,7 +278,7 @@ function SecondSlider() {
                   .slice(offset * index, offset * index + offset)
                   .map((movie) => (
                     <Box
-                      layoutId={String(movie.id) + "2"}
+                      layoutId={String(movie.id) + sliderString}
                       onClick={() => onBoxClicked(movie.id)}
                       key={movie.id}
                       variants={BoxVariants}
@@ -285,7 +290,7 @@ function SecondSlider() {
                         bgPhoto={makeImagePath(movie.backdrop_path, "w500")}
                       />
                       <Info variants={InfoVariants}>
-                        <h4>{movie.title}</h4>
+                        <h4>{movie.name}</h4>
                       </Info>
                     </Box>
                   ))}
@@ -293,7 +298,7 @@ function SecondSlider() {
             </AnimatePresence>
           </Slider>
           <AnimatePresence>
-            {sliderNum === 2 && bigMovieMatch ? (
+            {sliderNum === +sliderString && bigMovieMatch ? (
               <>
                 <Overlay
                   onClick={onOverlayClick}
@@ -302,7 +307,7 @@ function SecondSlider() {
                 />
                 <BigMovie
                   style={{ top: scrollY.get() + 100 }}
-                  layoutId={bigMovieMatch.params.movieId + "2"}
+                  layoutId={bigMovieMatch.params.tvId + sliderString}
                 >
                   {clickedMoive && (
                     <>
@@ -315,8 +320,8 @@ function SecondSlider() {
                         }}
                       />
                       <BigInfoBox>
-                        <BigTitle>{clickedMoive.title}</BigTitle>
-                        <h1>Released date : {clickedMoive.release_date}</h1>
+                        <BigTitle>{clickedMoive.name}</BigTitle>
+                        <h1>First Air date : {clickedMoive.first_air_date}</h1>
                         <BigInfoVote>
                           <FontAwesomeIcon
                             icon={faStar}
@@ -340,4 +345,4 @@ function SecondSlider() {
     </Wrapper>
   );
 }
-export default SecondSlider;
+export default TvFirstSlider;
