@@ -1,20 +1,7 @@
-import { useQuery } from "react-query";
 import styled from "styled-components";
-import {
-  getLatestMovie,
-  getMovies,
-  getTopRatedMovie,
-  getUpcomingMovie,
-  IGetLatestMoviesResult,
-  IGetMoviesResult,
-} from "../../api";
+import { IGetMoviesResult } from "../../api";
 import { makeImagePath } from "../../utils";
-import {
-  motion,
-  AnimatePresence,
-  animate,
-  useViewportScroll,
-} from "framer-motion";
+import { motion, AnimatePresence, useViewportScroll } from "framer-motion";
 import { useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -220,9 +207,17 @@ function MovieSlider({
   const toggleLeaving = () => setLeaving((prev) => !prev);
   const onBoxClicked = (movieId: number) => {
     setSliderNum(+sliderString);
+    if (sliderString === "21") {
+      return history.push(`/search`);
+    }
     history.push(`/movies/${movieId}`);
   };
-  const onOverlayClick = () => history.push("/");
+  const onOverlayClick = () => {
+    if (sliderString === "21") {
+      history.push(`/search`);
+    }
+    history.push("/");
+  };
   const clickedMoive =
     bigMovieMatch?.params.movieId &&
     data?.results.find(

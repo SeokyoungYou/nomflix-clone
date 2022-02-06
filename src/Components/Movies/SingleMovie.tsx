@@ -1,30 +1,11 @@
-import { useQuery } from "react-query";
 import styled from "styled-components";
-import {
-  getLatestMovie,
-  getLatestTv,
-  getMovies,
-  getTopRatedMovie,
-  getUpcomingMovie,
-  IGetLatestTvResult,
-  IGetMoviesResult,
-  IMovie,
-} from "../../api";
+import { IMovie } from "../../api";
 import { makeImagePath } from "../../utils";
-import {
-  motion,
-  AnimatePresence,
-  animate,
-  useViewportScroll,
-} from "framer-motion";
+import { motion, AnimatePresence, useViewportScroll } from "framer-motion";
 import { useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faAngleLeft,
-  faAngleRight,
-  faStar,
-} from "@fortawesome/free-solid-svg-icons";
+import { faStar } from "@fortawesome/free-solid-svg-icons";
 import { useRecoilState } from "recoil";
 import { sliderNumAtom } from "../../atom";
 const Wrapper = styled.div`

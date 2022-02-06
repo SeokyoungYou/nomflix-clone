@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { IGetMoviesResult, IGetTvResult } from "../../api";
+import { IGetTvResult } from "../../api";
 import { makeImagePath } from "../../utils";
 
 const Wrapper = styled.div`

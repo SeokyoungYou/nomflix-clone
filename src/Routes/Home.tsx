@@ -5,7 +5,6 @@ import {
   getMovies,
   getTopRatedMovie,
   getUpcomingMovie,
-  IGetLatestMoviesResult,
   IGetMoviesResult,
   IMovie,
 } from "../api";

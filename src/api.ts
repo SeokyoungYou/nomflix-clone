@@ -36,27 +36,6 @@ export interface IGetMoviesResult {
   total_results?: number;
 }
 
-export interface IGetLatestMoviesResult {
-  adult: boolean;
-  id: number;
-  poster_path: string;
-  title: string;
-  overview: string;
-  vote_average: number;
-  vote_count: number;
-  release_date: string;
-}
-export interface IGetLatestTvResult {
-  adult: boolean;
-  id: number;
-  poster_path: string;
-  title: string;
-  overview: string;
-  vote_average: number;
-  vote_count: number;
-  first_air_date: string;
-}
-
 export function getMovies() {
   return fetch(`${BASE_PATH}/movie/now_playing?api_key=${API_KEY}`).then(
     (response) => response.json()

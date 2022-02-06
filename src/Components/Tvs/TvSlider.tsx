@@ -1,21 +1,7 @@
-import { useQuery } from "react-query";
 import styled from "styled-components";
-import {
-  getLatestMovie,
-  getMovies,
-  getTopRatedMovie,
-  getUpcomingMovie,
-  IGetLatestMoviesResult,
-  IGetMoviesResult,
-  IGetTvResult,
-} from "../../api";
+import { IGetTvResult } from "../../api";
 import { makeImagePath } from "../../utils";
-import {
-  motion,
-  AnimatePresence,
-  animate,
-  useViewportScroll,
-} from "framer-motion";
+import { motion, AnimatePresence, useViewportScroll } from "framer-motion";
 import { useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -216,6 +202,9 @@ function TvSlider({ data, isLoading, slidertitle, sliderString }: ITvSlider) {
   const toggleLeaving = () => setLeaving((prev) => !prev);
   const onBoxClicked = (tvId: number) => {
     setSliderNum(+sliderString);
+    if (sliderString === "22") {
+      return history.push(`/search`);
+    }
     history.push(`/tvs/${tvId}`);
   };
   const onOverlayClick = () => history.push("/tvs");
