@@ -15,6 +15,9 @@ const Wrapper = styled.div`
   margin-top: 100px;
   width: 100%;
 `;
+const SliderWrapper = styled.div`
+  margin-top: 50px;
+`;
 
 function Search() {
   const location = useLocation();
@@ -29,22 +32,26 @@ function Search() {
   );
   return (
     <Wrapper>
-      {movie ? (
-        <MovieSlider
-          data={movie}
-          isLoading={movieLoading}
-          sliderString="21"
-          slidertitle="Moives"
-        />
-      ) : null}
-      {tv ? (
-        <TvSlider
-          data={tv}
-          isLoading={tvLoading}
-          sliderString="22"
-          slidertitle="Tv Shows"
-        />
-      ) : null}
+      <SliderWrapper>
+        {movie ? (
+          <MovieSlider
+            data={movie}
+            isLoading={movieLoading}
+            sliderString="21"
+            slidertitle="Moives"
+          />
+        ) : null}
+      </SliderWrapper>
+      <SliderWrapper>
+        {tv ? (
+          <TvSlider
+            data={tv}
+            isLoading={tvLoading}
+            sliderString="22"
+            slidertitle="Tv Shows"
+          />
+        ) : null}
+      </SliderWrapper>
     </Wrapper>
   );
 }

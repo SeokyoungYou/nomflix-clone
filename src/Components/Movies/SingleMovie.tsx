@@ -36,17 +36,6 @@ const SliderHeader = styled.div`
   display: flex;
   align-items: center;
 `;
-const SliderBtn = styled.button`
-  width: 30px;
-  height: 30px;
-  font-size: 25px;
-  border-radius: 15px;
-  border-style: none;
-  margin-left: 10px;
-  padding-top: 2px;
-  margin-top: 8px;
-  cursor: pointer;
-`;
 const Row = styled(motion.div)`
   display: grid;
   grid-template-columns: repeat(6, 1fr);
@@ -131,18 +120,6 @@ const BigTitle = styled.h3`
 const BigOverview = styled.p`
   color: ${(props) => props.theme.white.lighter};
 `;
-const rowVariants = {
-  hidden: (back: boolean) => ({
-    x: back ? -window.outerWidth - 5 : window.outerWidth + 5,
-  }),
-
-  visible: (back: boolean) => ({
-    x: 0,
-  }),
-  exit: (back: boolean) => ({
-    x: back ? window.outerWidth + 5 : -window.outerWidth - 5,
-  }),
-};
 const BoxVariants = {
   normal: {
     scale: 1,
@@ -174,7 +151,6 @@ function SingleMovie({
   const history = useHistory();
   const { scrollY } = useViewportScroll();
   const bigMovieMatch = useRouteMatch<{ movieId: string }>("/movies/:movieId");
-  const [back, setBack] = useState(false);
   const [index, setIndex] = useState(0);
   const [leaving, setLeaving] = useState(false);
   const [sliderNum, setSliderNum] = useRecoilState(sliderNumAtom);
@@ -195,20 +171,8 @@ function SingleMovie({
             <SliderHeader>
               <SliderTitle>{slidertitle}</SliderTitle>
             </SliderHeader>
-            <AnimatePresence
-              initial={false}
-              custom={back}
-              onExitComplete={toggleLeaving}
-            >
-              <Row
-                custom={back}
-                key={index}
-                variants={rowVariants}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-                transition={{ type: "tween", duration: 1 }}
-              >
+            <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
+              <Row key={index}>
                 {data ? (
                   <Box
                     layoutId={String(data.id) + sliderString}
