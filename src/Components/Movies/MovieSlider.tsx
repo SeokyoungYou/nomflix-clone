@@ -26,7 +26,6 @@ import {
 import { useRecoilState } from "recoil";
 import { sliderNumAtom } from "../../atom";
 
-const sliderString = "1";
 const Wrapper = styled.div`
   background-color: black;
   z-index: -1;
@@ -36,24 +35,6 @@ const Loader = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-`;
-const Banner = styled.div<{ bgPhoto: string }>`
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 60px;
-  background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 1)),
-    url(${(props) => props.bgPhoto});
-  background-size: cover;
-`;
-const Title = styled.h2`
-  font-size: 48px;
-  margin-bottom: 20px;
-`;
-const Overview = styled.p`
-  font-size: 24px;
-  width: 50%;
 `;
 const Slider = styled.div`
   position: relative;
@@ -197,14 +178,21 @@ const InfoVariants = {
   },
 };
 const offset = 6;
-function FirstSlider() {
+interface IMovieSlider {
+  data: IGetMoviesResult;
+  isLoading: boolean;
+  slidertitle: string;
+  sliderString: string;
+}
+function MovieSlider({
+  data,
+  isLoading,
+  slidertitle,
+  sliderString,
+}: IMovieSlider) {
   const history = useHistory();
   const { scrollY } = useViewportScroll();
   const bigMovieMatch = useRouteMatch<{ movieId: string }>("/movies/:movieId");
-  const { data, isLoading } = useQuery<IGetMoviesResult>(
-    ["movies", "nowPlaying"],
-    getMovies
-  );
   const [back, setBack] = useState(false);
   const [index, setIndex] = useState(0);
   const [leaving, setLeaving] = useState(false);
@@ -246,13 +234,9 @@ function FirstSlider() {
         <Loader>Loading</Loader>
       ) : (
         <>
-          <Banner bgPhoto={makeImagePath(data?.results[0].backdrop_path || "")}>
-            <Title>{data?.results[0].title}</Title>
-            <Overview>{data?.results[0].overview}</Overview>
-          </Banner>
           <Slider>
             <SliderHeader>
-              <SliderTitle>Now Playing Movies</SliderTitle>
+              <SliderTitle>{slidertitle}</SliderTitle>
               <SliderBtn onClick={prevBtnClicked}>
                 <FontAwesomeIcon icon={faAngleLeft} />
               </SliderBtn>
@@ -346,4 +330,4 @@ function FirstSlider() {
     </Wrapper>
   );
 }
-export default FirstSlider;
+export default MovieSlider;

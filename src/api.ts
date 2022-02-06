@@ -1,7 +1,7 @@
 const API_KEY = "63527560ca78326be8a203622e8cca0c";
 const BASE_PATH = "https://api.themoviedb.org/3";
 
-interface IMovie {
+export interface IMovie {
   id: number;
   backdrop_path: string;
   poster_path: string;
@@ -12,7 +12,7 @@ interface IMovie {
   adult: boolean;
   release_date: string;
 }
-interface ITv {
+export interface ITv {
   id: number;
   backdrop_path: string;
   poster_path: string;
@@ -24,20 +24,16 @@ interface ITv {
 }
 
 export interface IGetTvResult {
-  page: number;
+  page?: number;
   results: ITv[];
-  total_pages: number;
-  total_results: number;
+  total_pages?: number;
+  total_results?: number;
 }
 export interface IGetMoviesResult {
-  dates: {
-    maximum: string;
-    minimum: string;
-  };
-  page: number;
+  page?: number;
   results: IMovie[];
-  total_pages: number;
-  total_results: number;
+  total_pages?: number;
+  total_results?: number;
 }
 
 export interface IGetLatestMoviesResult {
@@ -102,5 +98,13 @@ export function getAiringTodayTv() {
   );
 }
 
-// On the / (home) page implement sliders for: Latest movies, Top Rated Movies and Upcoming Movies.
-// On the /tv page implement sliders for: Latest Shows, Airing Today, Popular, Top Rated.
+export function searchMovies(keyword: string | null) {
+  return fetch(
+    `${BASE_PATH}/search/movie?api_key=${API_KEY}&query=${keyword}`
+  ).then((response) => response.json());
+}
+export function searchTvs(keyword: string | null) {
+  return fetch(
+    `${BASE_PATH}/search/tv?api_key=${API_KEY}&query=${keyword}`
+  ).then((response) => response.json());
+}

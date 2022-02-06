@@ -230,7 +230,7 @@ function TvFirstSlider() {
         <>
           <Slider>
             <SliderHeader>
-              <SliderTitle>Airing Today Tvs</SliderTitle>
+              <SliderTitle>Airing Today TV Shows</SliderTitle>
               <SliderBtn onClick={prevBtnClicked}>
                 <FontAwesomeIcon icon={faAngleLeft} />
               </SliderBtn>

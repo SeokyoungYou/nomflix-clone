@@ -2,11 +2,14 @@ import { useQuery } from "react-query";
 import styled from "styled-components";
 import {
   getLatestMovie,
+  getLatestTv,
   getMovies,
   getTopRatedMovie,
   getUpcomingMovie,
-  IGetLatestMoviesResult,
+  IGetLatestTvResult,
   IGetMoviesResult,
+  IMovie,
+  ITv,
 } from "../../api";
 import { makeImagePath } from "../../utils";
 import {
@@ -25,8 +28,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useRecoilState } from "recoil";
 import { sliderNumAtom } from "../../atom";
-
-const sliderString = "3";
 const Wrapper = styled.div`
   background-color: black;
   z-index: -1;
@@ -178,51 +179,27 @@ const InfoVariants = {
     transition: { delay: 0.5, duration: 0.3, type: "tween" },
   },
 };
-const offset = 6;
-function ThirdSlider() {
+interface ISingleTv {
+  data: ITv;
+  isLoading: boolean;
+  slidertitle: string;
+  sliderString: string;
+}
+function SingleTv({ data, isLoading, slidertitle, sliderString }: ISingleTv) {
   const history = useHistory();
   const { scrollY } = useViewportScroll();
-  const bigMovieMatch = useRouteMatch<{ movieId: string }>("/movies/:movieId");
-  const { data, isLoading } = useQuery<IGetMoviesResult>(
-    ["movies", "upcoming"],
-    getUpcomingMovie
-  );
+  const bigMovieMatch = useRouteMatch<{ tvId: string }>("/tvs/:tvId");
   const [back, setBack] = useState(false);
   const [index, setIndex] = useState(0);
   const [leaving, setLeaving] = useState(false);
   const [sliderNum, setSliderNum] = useRecoilState(sliderNumAtom);
-
-  const nextBtnClicked = () => {
-    if (data) {
-      if (leaving) return;
-      setBack(false);
-      toggleLeaving();
-      const totalMovies = data.results.length - 1; //except banner movie
-      const maxIndex = Math.floor(totalMovies / offset);
-      setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
-    }
-  };
-  const prevBtnClicked = () => {
-    if (data) {
-      if (leaving) return;
-      setBack(true);
-      toggleLeaving();
-      const totalMovies = data.results.length - 1; //except banner movie
-      const maxIndex = Math.floor(totalMovies / offset);
-      setIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
-    }
-  };
   const toggleLeaving = () => setLeaving((prev) => !prev);
-  const onBoxClicked = (movieId: number) => {
+  const onBoxClicked = (tvId: number) => {
     setSliderNum(+sliderString);
-    history.push(`/movies/${movieId}`);
+    history.push(`/tvs/${tvId}`);
   };
-  const onOverlayClick = () => history.push("/");
-  const clickedMoive =
-    bigMovieMatch?.params.movieId &&
-    data?.results.find(
-      (movie) => String(movie.id) === bigMovieMatch.params.movieId
-    );
+  const onOverlayClick = () => history.push("/tvs");
+  const clickedMoive = data;
   return (
     <Wrapper>
       {isLoading ? (
@@ -231,13 +208,7 @@ function ThirdSlider() {
         <>
           <Slider>
             <SliderHeader>
-              <SliderTitle>Upcoming Movies</SliderTitle>
-              <SliderBtn onClick={prevBtnClicked}>
-                <FontAwesomeIcon icon={faAngleLeft} />
-              </SliderBtn>
-              <SliderBtn onClick={nextBtnClicked}>
-                <FontAwesomeIcon icon={faAngleRight} />
-              </SliderBtn>
+              <SliderTitle>{slidertitle}</SliderTitle>
             </SliderHeader>
             <AnimatePresence
               initial={false}
@@ -253,27 +224,22 @@ function ThirdSlider() {
                 exit="exit"
                 transition={{ type: "tween", duration: 1 }}
               >
-                {data?.results
-                  .slice(1)
-                  .slice(offset * index, offset * index + offset)
-                  .map((movie) => (
-                    <Box
-                      layoutId={String(movie.id) + sliderString}
-                      onClick={() => onBoxClicked(movie.id)}
-                      key={movie.id}
-                      variants={BoxVariants}
-                      whileHover="hover"
-                      initial="normal"
-                      transition={{ type: "tween" }}
-                    >
-                      <BoxImg
-                        bgPhoto={makeImagePath(movie.backdrop_path, "w500")}
-                      />
-                      <Info variants={InfoVariants}>
-                        <h4>{movie.title}</h4>
-                      </Info>
-                    </Box>
-                  ))}
+                {data ? (
+                  <Box
+                    layoutId={String(data.id) + sliderString}
+                    onClick={() => onBoxClicked(data.id)}
+                    key={data.id}
+                    variants={BoxVariants}
+                    whileHover="hover"
+                    initial="normal"
+                    transition={{ type: "tween" }}
+                  >
+                    <BoxImg bgPhoto={makeImagePath(data.poster_path, "w500")} />
+                    <Info variants={InfoVariants}>
+                      <h4>{data.name}</h4>
+                    </Info>
+                  </Box>
+                ) : null}
               </Row>
             </AnimatePresence>
           </Slider>
@@ -287,21 +253,21 @@ function ThirdSlider() {
                 />
                 <BigMovie
                   style={{ top: scrollY.get() + 100 }}
-                  layoutId={bigMovieMatch.params.movieId + sliderString}
+                  layoutId={bigMovieMatch.params.tvId + sliderString}
                 >
                   {clickedMoive && (
                     <>
                       <BigCover
                         style={{
                           backgroundImage: `linear-gradient(to top, black, transparent), url(${makeImagePath(
-                            clickedMoive.backdrop_path,
+                            clickedMoive.poster_path,
                             "w500"
                           )})`,
                         }}
                       />
                       <BigInfoBox>
-                        <BigTitle>{clickedMoive.title}</BigTitle>
-                        <h1>Released date : {clickedMoive.release_date}</h1>
+                        <BigTitle>{clickedMoive.name}</BigTitle>
+                        <h1>First Air Date : {clickedMoive.first_air_date}</h1>
                         <BigInfoVote>
                           <FontAwesomeIcon
                             icon={faStar}
@@ -325,4 +291,4 @@ function ThirdSlider() {
     </Wrapper>
   );
 }
-export default ThirdSlider;
+export default SingleTv;

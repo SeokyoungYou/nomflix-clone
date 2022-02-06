@@ -251,7 +251,7 @@ function TvFirstSlider() {
           </Banner>
           <Slider>
             <SliderHeader>
-              <SliderTitle>Popular Tvs</SliderTitle>
+              <SliderTitle>Popular TV Shows</SliderTitle>
               <SliderBtn onClick={prevBtnClicked}>
                 <FontAwesomeIcon icon={faAngleLeft} />
               </SliderBtn>

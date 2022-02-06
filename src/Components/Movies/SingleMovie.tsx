@@ -2,11 +2,13 @@ import { useQuery } from "react-query";
 import styled from "styled-components";
 import {
   getLatestMovie,
+  getLatestTv,
   getMovies,
   getTopRatedMovie,
   getUpcomingMovie,
-  IGetLatestMoviesResult,
+  IGetLatestTvResult,
   IGetMoviesResult,
+  IMovie,
 } from "../../api";
 import { makeImagePath } from "../../utils";
 import {
@@ -25,8 +27,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useRecoilState } from "recoil";
 import { sliderNumAtom } from "../../atom";
-
-const sliderString = "4";
 const Wrapper = styled.div`
   background-color: black;
   z-index: -1;
@@ -178,15 +178,21 @@ const InfoVariants = {
     transition: { delay: 0.5, duration: 0.3, type: "tween" },
   },
 };
-const offset = 6;
-function FourthSlider() {
+interface ISingleMovie {
+  data: IMovie;
+  isLoading: boolean;
+  slidertitle: string;
+  sliderString: string;
+}
+function SingleMovie({
+  data,
+  isLoading,
+  slidertitle,
+  sliderString,
+}: ISingleMovie) {
   const history = useHistory();
   const { scrollY } = useViewportScroll();
   const bigMovieMatch = useRouteMatch<{ movieId: string }>("/movies/:movieId");
-  const { data, isLoading } = useQuery<IGetLatestMoviesResult>(
-    ["movies", "lateset"],
-    getLatestMovie
-  );
   const [back, setBack] = useState(false);
   const [index, setIndex] = useState(0);
   const [leaving, setLeaving] = useState(false);
@@ -206,7 +212,7 @@ function FourthSlider() {
         <>
           <Slider>
             <SliderHeader>
-              <SliderTitle>Latest Movie</SliderTitle>
+              <SliderTitle>{slidertitle}</SliderTitle>
             </SliderHeader>
             <AnimatePresence
               initial={false}
@@ -265,7 +271,7 @@ function FourthSlider() {
                       />
                       <BigInfoBox>
                         <BigTitle>{clickedMoive.title}</BigTitle>
-                        <h1>Released date : {clickedMoive.release_date}</h1>
+                        <h1>Released Date : {clickedMoive.release_date}</h1>
                         <BigInfoVote>
                           <FontAwesomeIcon
                             icon={faStar}
@@ -289,4 +295,4 @@ function FourthSlider() {
     </Wrapper>
   );
 }
-export default FourthSlider;
+export default SingleMovie;

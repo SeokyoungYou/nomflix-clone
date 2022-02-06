@@ -207,7 +207,7 @@ function TvFourthSlider() {
         <>
           <Slider>
             <SliderHeader>
-              <SliderTitle>Latest Tv</SliderTitle>
+              <SliderTitle>Latest TV</SliderTitle>
             </SliderHeader>
             <AnimatePresence
               initial={false}
