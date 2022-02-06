@@ -18,7 +18,11 @@ import {
 import { useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
+import {
+  faAngleLeft,
+  faAngleRight,
+  faStar,
+} from "@fortawesome/free-solid-svg-icons";
 import { useRecoilState } from "recoil";
 import { sliderNumAtom } from "../../atom";
 const Wrapper = styled.div`
@@ -141,19 +145,25 @@ const BigCover = styled.div`
   width: 100%;
   background-size: cover;
   background-position: center center;
-  height: 400px;
+  height: 40%;
 `;
 const BigInfoBox = styled.div`
+  padding: 20px;
   position: relative;
-  top: -100px;
+  top: -80px;
+`;
+const BigInfoVote = styled.div`
+  display: flex;
+  align-items: center;
+  margin: 20px 0px;
+  gap: 10px;
 `;
 const BigTitle = styled.h3`
   color: ${(props) => props.theme.white.lighter};
-  padding: 46px;
   font-size: 28px;
+  margin-bottom: 50px;
 `;
 const BigOverview = styled.p`
-  padding: 20px;
   color: ${(props) => props.theme.white.lighter};
 `;
 const rowVariants = {
@@ -306,6 +316,17 @@ function SecondSlider() {
                       />
                       <BigInfoBox>
                         <BigTitle>{clickedMoive.title}</BigTitle>
+                        <h1>Released date : {clickedMoive.release_date}</h1>
+                        <BigInfoVote>
+                          <FontAwesomeIcon
+                            icon={faStar}
+                            style={{ color: "yellow" }}
+                          />
+                          <h1>
+                            {clickedMoive.vote_average} (
+                            {clickedMoive.vote_count})
+                          </h1>
+                        </BigInfoVote>
                         <BigOverview>{clickedMoive.overview}</BigOverview>
                       </BigInfoBox>
                     </>
